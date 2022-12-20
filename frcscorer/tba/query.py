@@ -22,11 +22,19 @@ def main():
 
 
 def status():
+    '''
+    Queries TBA for its status.
+    Returns the HTTP status code.
+    '''
     res = requests.get(TBA_BASE_URL + 'status', headers=HEADER)
     return res.status_code
 
 
 def teams():
+    '''
+    Queries TBA for teams by page.
+    Returns a list of teams.
+    '''
     teamlist = list()
     page_num = 0
     logging.debug(f'GET {TBA_BASE_URL}teams/{page_num}/simple')
