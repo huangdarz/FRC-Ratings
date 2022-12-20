@@ -5,8 +5,7 @@ import os
 
 load_dotenv()
 
-client = FaunaClient(
-    secret=os.environ['FAUNA_SECRET_KEY'])
+client = FaunaClient(secret=os.environ['FAUNA_SECRET_KEY'])
 
 # res = client.ping()
 
