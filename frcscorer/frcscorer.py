@@ -6,6 +6,6 @@ print(query.status())
 
 teams = query.teams()
 
-teamdata.create_team_data(teams, 'TeamsSimple')
+# teamdata.create_team_data(teams, 'TeamsSimple')
 
 print('Done')
