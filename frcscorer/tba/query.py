@@ -1,7 +1,6 @@
 import requests
 from dotenv import load_dotenv
 import os
-import json
 import logging
 
 TBA_BASE_URL = 'https://www.thebluealliance.com/api/v3/'
@@ -43,7 +42,7 @@ def teams():
     logging.debug(f'Response status code: {res.status_code}')
 
     while res.status_code == 200:
-        data = json.loads(res.text)
+        data = res.json()
         if len(data) == 0:
             break
         teamlist.extend(data)
