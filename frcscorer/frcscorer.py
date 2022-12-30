@@ -2,10 +2,17 @@ from tba import query
 from teamdata import teamdata
 
 
-print(query.status())
+def main():
+    print('Done')
 
-teams = query.teams()
 
-# teamdata.create_team_data(teams, 'TeamsSimple')
+def load_teams():
+    if query.status() != 200:
+        return
 
-print('Done')
+    teams = query.teams()
+    teamdata.create_team_data(teams, 'TeamsSimple')
+
+
+if __name__ == '__main__':
+    main()
