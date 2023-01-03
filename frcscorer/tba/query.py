@@ -2,6 +2,7 @@ import requests
 from dotenv import load_dotenv
 import os
 import logging
+from tqdm import tqdm
 
 TBA_BASE_URL = 'https://www.thebluealliance.com/api/v3'
 
@@ -79,7 +80,7 @@ def event_matches_consumer(year, consumer):
     keys = res.json()
 
     skipped_keys = []
-    for key in keys:
+    for key in tqdm(keys):
         match_data = matches_from_event(key)
         if match_data is None:
             skipped_keys.append(key)
@@ -92,13 +93,29 @@ def event_matches_consumer(year, consumer):
 
 
 def matches_from_event(event_key):
-    res = requests.get(TBA_BASE_URL + f'/event/{event_key}/matches/simple')
+    logging.info(f'Querying {event_key}')
+    res = requests.get(
+        TBA_BASE_URL + f'/event/{event_key}/matches/simple', headers=HEADER)
     if res.status_code != 200:
         logging.warning(f'Event: {event_key} status code is NOT 200')
         return None
     data = res.json()
-    data.sort(key=lambda m: m['actual_time'])
-    return data
+    if len(data) == 0:
+        return None
+    qm = [match for match in data if match['comp_level'] == 'qm']
+    ef = [match for match in data if match['comp_level'] == 'ef']
+    qf = [match for match in data if match['comp_level'] == 'qf']
+    sf = [match for match in data if match['comp_level'] == 'sf']
+    f = [match for match in data if match['comp_level'] == 'f']
+
+    qm.sort(key=lambda m: m['match_number'])
+    ef.sort(key=lambda m: m['match_number'])
+    qf.sort(key=lambda m: m['match_number'])
+    sf.sort(key=lambda m: m['match_number'])
+    f.sort(key=lambda m: m['match_number'])
+
+    sorted_data = qm + ef + qf + sf + f
+    return sorted_data
 
 
 if __name__ == '__main__':
