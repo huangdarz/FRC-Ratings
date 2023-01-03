@@ -33,7 +33,7 @@ def load_alltime_ratings():
     teamratings = alltime.AllTimeRating(teams)
     skipped_years = []
     skipped_events = []
-    for year in tqdm(range(1992, 2003)):
+    for year in tqdm(range(1992, 2023)):
         res = query.event_matches_consumer(year, teamratings.rate_match)
         if res is None:
             skipped_years.append(year)
@@ -42,7 +42,10 @@ def load_alltime_ratings():
             skipped_events.extend(res[1])
             continue
 
-    print(teamratings.teamratings)
+    # print(teamratings.teamratings)
+    with open('teamratings.txt', 'x') as trfile:
+        for team, rating in teamratings.teamratings.items():
+            trfile.write(f'{team}:{rating}\n')
 
     return skipped_years, skipped_events
 

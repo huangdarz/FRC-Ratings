@@ -11,6 +11,10 @@ class AllTimeRating:
         red = alliances['red']
         bluekeys = blue['team_keys']
         redkeys = red['team_keys']
+        if len(bluekeys) == 0:
+            return
+        if len(redkeys) == 0:
+            return
         blue_curr_ratings = []
         for tk in bluekeys:
             try:
