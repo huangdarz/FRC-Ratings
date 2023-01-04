@@ -3,18 +3,20 @@ from teamdata import teamdata
 from ratings import alltime
 from tqdm import tqdm
 import logging
+import os
+from faunadb.client import FaunaClient
+from dotenv import load_dotenv
 
 
 def main():
+    load_dotenv()
     logging.basicConfig(filename='alltimeratings.log',
                         level=logging.INFO, filemode='w',
                         format='%(asctime)s %(levelname)s:%(message)s',
                         datefmt='%d/%m/%Y %I:%M:%S %p')
-    res = load_alltime_ratings()
+    res = load_alltime_ratings(csv='teamratings.csv')
     if res is None:
         return
-    print(f'Skipped years {res[0]}')
-    print(f'Skipped events {res[1]}')
     print('Done')
 
 
@@ -26,14 +28,14 @@ def load_teams():
     teamdata.create_team_data(teams, 'TeamsSimple')
 
 
-def load_alltime_ratings():
+def load_alltime_ratings(start: int = 1992, end: int = 2023, csv: str = ''):
     if query.status() != 200:
         return
     teams = query.teams()
     teamratings = alltime.AllTimeRating(teams)
     skipped_years = []
     skipped_events = []
-    for year in tqdm(range(1992, 2023)):
+    for year in tqdm(range(start, end)):
         res = query.event_matches_consumer(year, teamratings.rate_match)
         if res is None:
             skipped_years.append(year)
@@ -42,10 +44,11 @@ def load_alltime_ratings():
             skipped_events.extend(res[1])
             continue
 
-    # print(teamratings.teamratings)
-    with open('teamratings.txt', 'x') as trfile:
-        for team, rating in teamratings.teamratings.items():
-            trfile.write(f'{team}:{rating}\n')
+    if len(csv) != 0:
+        teamratings.save_to_csvfile(csv)
+
+    client = FaunaClient(secret=os.environ['FAUNA_SECRET_KEY'])
+    teamratings.save_to_db(client, 'AllTimeRatings')
 
     return skipped_years, skipped_events
 
