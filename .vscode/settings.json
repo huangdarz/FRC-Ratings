@@ -1,4 +1,12 @@
 {
     "python.linting.flake8Enabled": true,
-    "editor.formatOnSave": true
+    "editor.formatOnSave": true,
+    "logViewer.logLevel": "info",
+    "logViewer.watch": [
+        {
+            "title": "All log files",
+            "pattern": "*.log"
+        }
+    ],
+    "python.analysis.typeCheckingMode": "basic"
 }
