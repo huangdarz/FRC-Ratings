@@ -10,11 +10,11 @@ from dotenv import load_dotenv
 
 def main():
     load_dotenv()
-    logging.basicConfig(filename='alltimeratings.log',
+    logging.basicConfig(filename='alltimeinseasonratings.log',
                         level=logging.INFO, filemode='w',
                         format='%(asctime)s %(levelname)s:%(message)s',
                         datefmt='%d/%m/%Y %I:%M:%S %p')
-    res = load_alltime_ratings(csv='teamratings.csv')
+    res = load_alltime_ratings(csv='teamratingsinseason.csv')
     if res is None:
         return
     print('Done')
@@ -48,7 +48,7 @@ def load_alltime_ratings(start: int = 1992, end: int = 2023, csv: str = ''):
         teamratings.save_to_csvfile(csv)
 
     client = FaunaClient(secret=os.environ['FAUNA_SECRET_KEY'])
-    teamratings.save_to_db(client, 'AllTimeRatings')
+    teamratings.save_to_db(client, 'AllTimeInSeasonRatings')
 
     return skipped_years, skipped_events
 

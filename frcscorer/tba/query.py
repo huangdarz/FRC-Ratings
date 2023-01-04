@@ -59,7 +59,7 @@ def teams():
     return teamlist
 
 
-def event_matches_consumer(year, consumer):
+def event_matches_consumer(year, consumer, include_off_pre_season=False):
     '''
     Queries a specific year for their event keys.
     Returns a tuple of a list of all the keys and a list of keys.
@@ -81,6 +81,10 @@ def event_matches_consumer(year, consumer):
 
     skipped_keys = []
     for key in tqdm(keys):
+        inseason = is_event_inseason(key)
+        if not inseason and not include_off_pre_season:
+            logging.warning(f'Skipping pre/off season event {key}')
+            continue
         match_data = matches_from_event(key)
         if match_data is None:
             skipped_keys.append(key)
@@ -90,6 +94,16 @@ def event_matches_consumer(year, consumer):
             consumer(match)
 
     return keys, skipped_keys
+
+
+def is_event_inseason(event_key) -> bool:
+    res = requests.get(
+        TBA_BASE_URL + f'/event/{event_key}/simple', headers=HEADER)
+    if res.status_code != 200:
+        logging.warning('Querying event details failed; assuming in season')
+        return True
+    data = res.json()
+    return data['event_type'] != 99 and data['event_type'] != 100
 
 
 def matches_from_event(event_key):
